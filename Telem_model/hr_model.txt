@@ -1,0 +1,15 @@
+
+model {
+    
+    #PRIORS
+    b0 ~ dnorm(0,0.001)
+    b1 ~ dnorm(0,0.001)
+    tau<-1/(sigma*sigma)
+    sigma~dunif(0,10)
+        
+    #Snag 
+    for (i in 1:nbird) {
+   	 hr[i] ~ dnorm(b0 + b1*snag[i],tau)
+  	  }
+    }
+    

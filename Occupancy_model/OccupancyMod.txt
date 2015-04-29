@@ -1,0 +1,57 @@
+ 
+model {
+	
+	#PRIORS
+	#prior for random fire-area intercept effect
+	for (j in 1:nfire){
+	fire[j] ~ dnorm(0, fire.tau)
+	}
+	
+	#prior for random fire effect variance
+	fire.tau <- 1/(fire.sigma * fire.sigma)
+	fire.sigma ~ dunif(0,10)
+	
+	#priors for intercepts
+	psi0 ~ dunif(0,1)
+	p0 ~ dunif(0,1)
+	a0 <- log(p0/(1-p0))
+	
+	#priors for logit-linear model coefficients
+	a1 ~ dnorm(0,0.001)
+	a2 ~ dnorm(0,0.001)
+	a3 ~ dnorm(0,0.001)
+	b1 ~ dnorm(0,0.001)
+	b2 ~ dnorm(0,0.001)
+	b3 ~ dnorm(0,0.001)
+	b4 ~ dnorm(0,0.001)
+  b5 ~ dnorm(0,0.001)
+  b6 ~ dnorm(0,0.001)
+	g1 ~ dnorm(0,0.001)
+
+	#random effect prior for WHR-type
+	for (m in 1:nwhr) {
+	b0[m] ~ dnorm(log(psi0/(1-psi0)), 0.001)	
+	}
+
+		
+	#Estimation of status for each fire/year
+	for (l in 1:nfire){
+		logit.w[l] <- fire[l] + g1*fa[l]
+		w[l] <- 1/(1+exp(-logit.w[l]))
+		W[l] ~ dbern(w[l])
+		
+		for (i in 1:npoint[l]){
+			logit.psi[i,l] <- b0[whr[i,l]] + b1*elev[i,l] + b2*elev2[i,l] + b3*size[i,l] + b4*cc[i,l] + b5*precc[i,l] + b6*lat[i,l]
+			psi[i,l] <- 1/(1+exp(-logit.psi[i,l]))
+			mu.psi[i,l] <- psi[i,l]*W[l]
+			z[i,l] ~ dbern(mu.psi[i,l])
+			
+			for(k in 1:K){
+				logit.p[i,k,l] <- a0 + a1*ef[k] + a2*itype[k] + a3*jday[i,l]
+				p[i,k,l] <- 1/(1+exp(-logit.p[i,k,l]))
+				muy[i,k,l] <- z[i,l]*p[i,k,l]
+				y[i,k,l] ~ dbern(muy[i,k,l])
+				}
+			}
+		}
+	}
