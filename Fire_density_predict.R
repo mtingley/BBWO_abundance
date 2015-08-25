@@ -17,16 +17,16 @@ library(R2jags)  # not required but will give errors otherwise
 #------------- Import data-------------
 ## Load Occupancy data and model posterior
 folder <- getwd()
-setwd("./Occupancy_model")
+setwd("./Model_Occupancy/")
 load("Occupancy_data.Rdata")
 load("Occupancy_posterior.Rdata") 
 # Load Telemetry model posterior 
 setwd("../")
-setwd("./Telem_model/")
+setwd("./Model_HomeRange//")
 load("HR_posterior.Rdata")
 # Load Snag model posterior
 setwd("../")
-setwd("./Snag_model/")
+setwd("./Model_Snag//")
 load("snag_posterior.Rdata")
 load("snag_variable_means.Rdata")
 
